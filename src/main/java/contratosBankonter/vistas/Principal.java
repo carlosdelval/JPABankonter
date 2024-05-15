@@ -27,6 +27,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
 import javax.swing.JSlider;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -38,14 +39,15 @@ public class Principal extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField jtfDescripcion;
-	private JTextField jtfTipoContrato;
+	private static JTextField jtfTipoContrato;
 	private JTextField jtfUser;
-	private Contrato actual;
+	private static Contrato actual;
 	private JSlider sliderSaldo;
 	private JFormattedTextField jftfFecha;
 	private JSpinner jspinnerLimite;
 	private JLabel lblValorSaldo;
 	private DateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy hh:mm a");
+	private static JDialog dialogo = new JDialog();
 
 	/**
 	 * Launch the application.
@@ -68,7 +70,7 @@ public class Principal extends JFrame {
 	 */
 	public Principal() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 500, 350);
+		setBounds(100, 100, 600, 350);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -133,6 +135,7 @@ public class Principal extends JFrame {
 		jspinnerLimite.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				sliderSaldo.setMaximum(((Integer)jspinnerLimite.getValue()).intValue());
+				sliderSaldo.setValue((int)actual.getSaldo());
 			}
 		});
 		GridBagConstraints gbc_jspinnerLimite = new GridBagConstraints();
@@ -175,6 +178,7 @@ public class Principal extends JFrame {
 		contentPane.add(lblTipoContrato, gbc_lblTipoContrato);
 		
 		jtfTipoContrato = new JTextField();
+		jtfTipoContrato.setEnabled(false);
 		GridBagConstraints gbc_jtfTipoContrato = new GridBagConstraints();
 		gbc_jtfTipoContrato.gridwidth = 6;
 		gbc_jtfTipoContrato.insets = new Insets(0, 0, 5, 5);
@@ -184,7 +188,13 @@ public class Principal extends JFrame {
 		contentPane.add(jtfTipoContrato, gbc_jtfTipoContrato);
 		jtfTipoContrato.setColumns(10);
 		
-		JButton btnTipoContrato = new JButton("Seleccionar");
+		JButton btnTipoContrato = new JButton("Seleccionar tipo contrato");
+		btnTipoContrato.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				PanelTipoContrato panelContrato = new PanelTipoContrato();
+				contratosBankonter.recursos.Utils.abrirNuevoDialogo(panelContrato, "Tipos de contrato", dialogo);
+			}
+		});
 		GridBagConstraints gbc_btnTipoContrato = new GridBagConstraints();
 		gbc_btnTipoContrato.gridwidth = 3;
 		gbc_btnTipoContrato.insets = new Insets(0, 0, 5, 0);
@@ -210,7 +220,8 @@ public class Principal extends JFrame {
 		contentPane.add(jtfUser, gbc_jtfUser);
 		jtfUser.setColumns(10);
 		
-		JButton btnUser = new JButton("Seleccionar");
+		JButton btnUser = new JButton("Seleccionar usuario ");
+		btnUser.setIcon(new ImageIcon(Principal.class.getResource("/contratosBankonter/recursos/conectado.png")));
 		GridBagConstraints gbc_btnUser = new GridBagConstraints();
 		gbc_btnUser.insets = new Insets(0, 0, 5, 0);
 		gbc_btnUser.gridwidth = 3;
@@ -322,6 +333,8 @@ public class Principal extends JFrame {
 		gbc_btnDelete.gridx = 9;
 		gbc_btnDelete.gridy = 9;
 		contentPane.add(btnDelete, gbc_btnDelete);
+		actual = cargaPrimero();
+		cargaInfo(actual);
 	}
 	
 	/**
@@ -339,8 +352,8 @@ public class Principal extends JFrame {
 		this.jspinnerLimite.setValue((int)c.getLimite());
 		this.sliderSaldo.setValue((int)c.getSaldo());
 		this.lblValorSaldo.setText("" + (int)c.getSaldo() + " €");
-		this.jtfTipoContrato.setText(tipo.getDescripcion());
-		this.jtfUser.setText(user.getNombreUsuario());
+		this.jtfTipoContrato.setText(tipo.getId() + " - " + tipo.getDescripcion());
+		this.jtfUser.setText(user.getId() + " - " + user.getNombreUsuario());
 	}
 	
 	/**
@@ -418,7 +431,7 @@ public class Principal extends JFrame {
 	 * 
 	 */
 	
-	private void setUser(int id) {
+	public void setUser(int id) {
 		ControladorUsuario cu = new ControladorUsuario();
 		this.jtfUser.setText(((Usuario)cu.findById(id)).getNombreUsuario());
 		actual.setIdUsuario(id);
@@ -428,9 +441,9 @@ public class Principal extends JFrame {
 	 * 
 	 */
 	
-	private void setTipo(int id) {
+	public static void setTipo(int id) {
 		ControladorTipoContrato ctc = new ControladorTipoContrato();
-		this.jtfTipoContrato.setText(((Tipocontrato)ctc.findById(id)).getDescripcion());
+		jtfTipoContrato.setText(id + " - " + ((Tipocontrato)ctc.findById(id)).getDescripcion());
 		actual.setIdUsuario(id);
 	}
 	
@@ -446,5 +459,13 @@ public class Principal extends JFrame {
 		actual.setLimite((int)this.jspinnerLimite.getValue());
 		actual.setSaldo(this.sliderSaldo.getValue());
 		cc.remove(actual);
+	}
+	
+	/**
+	 * 
+	 */
+	
+	public static void cerrarDialogo() {
+		dialogo.dispose();
 	}
 }

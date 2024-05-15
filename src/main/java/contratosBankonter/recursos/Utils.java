@@ -9,8 +9,7 @@ public class Utils {
 	/**
 	 * 
 	 */
-	public static void abrirNuevoDialogo(JPanel panel, String titulo) {
-		JDialog dialogo = new JDialog();
+	public static void abrirNuevoDialogo(JPanel panel, String titulo, JDialog dialogo) {
 		// El usuario no puede redimensionar el di�logo
 		dialogo.setResizable(true);
 		// t�tulo del d�alogo
