@@ -20,9 +20,8 @@ public class DatosDeTabla {
 	 * 
 	 * @return
 	 */
-	public static Object[][] getDatosDeTabla() {
+	public static Object[][] getDatosDeTabla(List<Tipocontrato> tipos) {
 		ControladorTipoContrato cp = new ControladorTipoContrato();
-		List<Tipocontrato> tipos = (List<Tipocontrato>) cp.findAll();
 		// Preparo una estructura para pasar al constructor de la JTable
 		Object[][] datos = new Object[tipos.size()][2];
 		// Cargo los datos de la lista de personas en la matriz de los datos

@@ -221,6 +221,12 @@ public class Principal extends JFrame {
 		jtfUser.setColumns(10);
 		
 		JButton btnUser = new JButton("Seleccionar usuario ");
+		btnUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				PanelUsuarios panelUsu = new PanelUsuarios();
+				contratosBankonter.recursos.Utils.abrirNuevoDialogo(panelUsu, "Selección de usuario", dialogo);
+			}
+		});
 		btnUser.setIcon(new ImageIcon(Principal.class.getResource("/contratosBankonter/recursos/conectado.png")));
 		GridBagConstraints gbc_btnUser = new GridBagConstraints();
 		gbc_btnUser.insets = new Insets(0, 0, 5, 0);
@@ -329,6 +335,7 @@ public class Principal extends JFrame {
 		});
 		btnDelete.setIcon(new ImageIcon(Principal.class.getResource("/contratosBankonter/recursos/eliminar.png")));
 		GridBagConstraints gbc_btnDelete = new GridBagConstraints();
+		gbc_btnDelete.anchor = GridBagConstraints.WEST;
 		gbc_btnDelete.insets = new Insets(0, 0, 5, 0);
 		gbc_btnDelete.gridx = 9;
 		gbc_btnDelete.gridy = 9;

@@ -1,6 +1,10 @@
 package contratosBankonter.tablas;
 
+import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
+
+import contratosBankonter.entidades.Tipocontrato;
 
 
 public class MiTableModel  extends AbstractTableModel {
@@ -10,9 +14,9 @@ public class MiTableModel  extends AbstractTableModel {
 	/**
 	 * 
 	 */
-	public MiTableModel() {
+	public MiTableModel(List<Tipocontrato> tipos) {
 		// Datos a presentar en la tabla
-		datos = DatosDeTabla.getDatosDeTabla();
+		datos = DatosDeTabla.getDatosDeTabla(tipos);
 		titulos = DatosDeTabla.getTitulosColumnas();
 	}
 	
