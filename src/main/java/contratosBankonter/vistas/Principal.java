@@ -40,7 +40,7 @@ public class Principal extends JFrame {
 	private JPanel contentPane;
 	private JTextField jtfDescripcion;
 	private static JTextField jtfTipoContrato;
-	private JTextField jtfUser;
+	private static JTextField jtfUser;
 	private static Contrato actual;
 	private JSlider sliderSaldo;
 	private JFormattedTextField jftfFecha;
@@ -438,9 +438,9 @@ public class Principal extends JFrame {
 	 * 
 	 */
 	
-	public void setUser(int id) {
+	public static void setUser(int id) {
 		ControladorUsuario cu = new ControladorUsuario();
-		this.jtfUser.setText(((Usuario)cu.findById(id)).getNombreUsuario());
+		jtfUser.setText(id + " - " + ((Usuario)cu.findById(id)).getNombreUsuario());
 		actual.setIdUsuario(id);
 	}
 	

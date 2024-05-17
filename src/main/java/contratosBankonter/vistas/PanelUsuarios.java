@@ -11,6 +11,7 @@ import contratosBankonter.entidades.Usuario;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
@@ -29,7 +30,9 @@ public class PanelUsuarios extends JPanel {
 	private JCheckBox chckSensitive;
 	private JRadioButton rbtnEmail;
 	private JRadioButton rbtnNombreUsu;
-	private List<Usuario> usuarios = new ArrayList<>();
+	private ControladorUsuario cu = new ControladorUsuario();
+	private List<Usuario> usuarios = (List<Usuario>)cu.findAll();
+	private List<Usuario> usuariosFiltrados = new ArrayList<>();
 	private DefaultListModel<Usuario> listModelUsuario = null;
 	private JScrollPane scrollPane;
 	private JList list;
@@ -69,42 +72,39 @@ public class PanelUsuarios extends JPanel {
 		
 		rbtnNombreUsu = new JRadioButton("Búsqueda sobre nombre usuario");
 		GridBagConstraints gbc_rbtnNombreUsu = new GridBagConstraints();
+		gbc_rbtnNombreUsu.anchor = GridBagConstraints.WEST;
 		gbc_rbtnNombreUsu.insets = new Insets(0, 0, 5, 5);
 		gbc_rbtnNombreUsu.gridx = 0;
 		gbc_rbtnNombreUsu.gridy = 1;
 		add(rbtnNombreUsu, gbc_rbtnNombreUsu);
 		
-		btnRecargar = new JButton("Recargar");
-		btnRecargar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				cargaUsuarios();
-			}
-		});
-		GridBagConstraints gbc_btnRecargar = new GridBagConstraints();
-		gbc_btnRecargar.insets = new Insets(0, 0, 5, 0);
-		gbc_btnRecargar.gridx = 1;
-		gbc_btnRecargar.gridy = 1;
-		add(btnRecargar, gbc_btnRecargar);
-		
 		rbtnEmail = new JRadioButton("Búsqueda sobre e-mail");
 		GridBagConstraints gbc_rbtnEmail = new GridBagConstraints();
+		gbc_rbtnEmail.anchor = GridBagConstraints.WEST;
 		gbc_rbtnEmail.insets = new Insets(0, 0, 5, 5);
 		gbc_rbtnEmail.gridx = 0;
 		gbc_rbtnEmail.gridy = 2;
 		add(rbtnEmail, gbc_rbtnEmail);
 		
+		ButtonGroup grupoOpciones = new ButtonGroup();
+		grupoOpciones.add(rbtnEmail);
+		grupoOpciones.add(rbtnNombreUsu);
+		
 		chckSensitive = new JCheckBox("Case-sensitive");
 		GridBagConstraints gbc_chckSensitive = new GridBagConstraints();
+		gbc_chckSensitive.anchor = GridBagConstraints.WEST;
 		gbc_chckSensitive.insets = new Insets(0, 0, 5, 5);
 		gbc_chckSensitive.gridx = 0;
 		gbc_chckSensitive.gridy = 3;
 		add(chckSensitive, gbc_chckSensitive);
 		
-		cargaUsuarios();
+		list = new JList(this.getDefaultListModel(usuarios));
+		this.list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
 		scrollPane = new JScrollPane(list);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
+		gbc_scrollPane.gridwidth = 2;
+		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 0;
 		gbc_scrollPane.gridy = 4;
@@ -112,7 +112,13 @@ public class PanelUsuarios extends JPanel {
 		
 		
 		JButton btnSeleccion = new JButton("Seleccionar usuario");
+		btnSeleccion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				seleccionarUsuario();
+			}
+		});
 		GridBagConstraints gbc_btnSeleccion = new GridBagConstraints();
+		gbc_btnSeleccion.gridwidth = 2;
 		gbc_btnSeleccion.insets = new Insets(0, 0, 0, 5);
 		gbc_btnSeleccion.gridx = 0;
 		gbc_btnSeleccion.gridy = 5;
@@ -120,22 +126,37 @@ public class PanelUsuarios extends JPanel {
 
 	}
 	
+	/**
+	 * 
+	 */
+	
 	private void filtraUsuarios() {
-		ControladorUsuario cu = new ControladorUsuario();
-		for(Usuario u : (List<Usuario>)cu.findAll()) {
-			if(this.rbtnEmail.isSelected()) {
-				if(this.chckSensitive.isEnabled()) {
-					if(!u.getEmail().contains(this.jtfFiltro.getText())) listModelUsuario.removeElement(u);
-				}else {
-					if(!u.getEmail().toLowerCase().contains(this.jtfFiltro.getText().toLowerCase())) listModelUsuario.removeElement(u);
+		listModelUsuario.clear();
+		usuariosFiltrados.clear();
+		if(this.jtfFiltro.getText().isEmpty()) {
+			for (Usuario u : usuarios) {
+                listModelUsuario.addElement(u);
+            }
+		}else {
+			for(Usuario u : usuarios) {
+				if(this.rbtnEmail.isSelected()) {
+					if(this.chckSensitive.isSelected()) {
+						if(u.getEmail().contains(this.jtfFiltro.getText())) usuariosFiltrados.add(u);
+					}else {
+						if(u.getEmail().toLowerCase().contains(this.jtfFiltro.getText().toLowerCase())) usuariosFiltrados.add(u);
+					}
 				}
-			}else {
-				if(this.chckSensitive.isEnabled()) {
-					if(!u.getNombreUsuario().contains(this.jtfFiltro.getText())) listModelUsuario.removeElement(u);
-				}else {
-					if(!u.getNombreUsuario().toLowerCase().contains(this.jtfFiltro.getText().toLowerCase())) listModelUsuario.removeElement(u);
+				if(this.rbtnNombreUsu.isSelected()) {
+					if(this.chckSensitive.isSelected()) {
+						if(u.getNombreUsuario().contains(this.jtfFiltro.getText())) usuariosFiltrados.add(u);
+					}else {
+						if(u.getNombreUsuario().toLowerCase().contains(this.jtfFiltro.getText().toLowerCase())) usuariosFiltrados.add(u);
+					}
 				}
 			}
+			for (Usuario u : usuariosFiltrados) {
+                listModelUsuario.addElement(u);
+            }
 		}
 	}
 	
@@ -151,25 +172,13 @@ public class PanelUsuarios extends JPanel {
 		return this.listModelUsuario;
 	}
 	
-	/**
-	 * 
-	 */
-	
-	private void cargaUsuarios() {
-		ControladorUsuario cu = new ControladorUsuario();
-		usuarios.clear();
-		for(Usuario u : (List<Usuario>)cu.findAll()) {
-			usuarios.add(u);
-		}
-		list = new JList(this.getDefaultListModel(usuarios));
-		this.list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-	}
 	
 	/**
 	 * 
 	 */
 	
 	private void seleccionarUsuario() {
-		
+		contratosBankonter.vistas.Principal.setUser((usuarios.get(list.getSelectedIndex()).getId()));
+		contratosBankonter.vistas.Principal.cerrarDialogo();
 	}
 }
